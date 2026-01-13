@@ -53,33 +53,58 @@ def get_YFin_data(
     start_date: Annotated[str, "Start date in yyyy-mm-dd format"],
     end_date: Annotated[str, "End date in yyyy-mm-dd format"],
 ) -> str:
-    # read in data
-    data = pd.read_csv(
-        os.path.join(
-            DATA_DIR,
-            f"market_data/price_data/{symbol}-YFin-data-2015-01-01-2025-03-25.csv",
+    """
+    Read stock data from local CSV files. Automatically searches for matching CSV files
+    in the market_data/price_data directory.
+    """
+    price_data_dir = os.path.join(DATA_DIR, "market_data/price_data")
+    
+    # Check if the directory exists
+    if not os.path.exists(price_data_dir):
+        raise FileNotFoundError(f"Price data directory not found: {price_data_dir}")
+    
+    # Search for CSV files matching the symbol
+    matching_files = []
+    for filename in os.listdir(price_data_dir):
+        if filename.startswith(f"{symbol}-") and filename.endswith(".csv"):
+            matching_files.append(filename)
+    
+    if not matching_files:
+        raise FileNotFoundError(
+            f"No local data file found for symbol '{symbol}' in {price_data_dir}. "
+            f"Expected format: {symbol}-YFin-data-YYYY-MM-DD-YYYY-MM-DD.csv"
         )
-    )
-
-    if end_date > "2025-03-25":
-        raise Exception(
-            f"Get_YFin_Data: {end_date} is outside of the data range of 2015-01-01 to 2025-03-25"
-        )
-
+    
+    # Use the first matching file (or implement logic to choose the best match)
+    csv_file = matching_files[0]
+    csv_path = os.path.join(price_data_dir, csv_file)
+    
+    print(f"DEBUG: Loading local data from: {csv_file}")
+    
+    # Read in data (skip comment lines starting with #)
+    data = pd.read_csv(csv_path, comment='#')
+    
     # Extract just the date part for comparison
     data["DateOnly"] = data["Date"].str[:10]
-
+    
     # Filter data between the start and end dates (inclusive)
     filtered_data = data[
         (data["DateOnly"] >= start_date) & (data["DateOnly"] <= end_date)
     ]
-
+    
     # Drop the temporary column we created
     filtered_data = filtered_data.drop("DateOnly", axis=1)
-
-    # remove the index from the dataframe
+    
+    # Check if we have data in the requested range
+    if filtered_data.empty:
+        raise ValueError(
+            f"No data available for {symbol} in the date range {start_date} to {end_date}. "
+            f"Local file '{csv_file}' does not contain data for this period."
+        )
+    
+    # Remove the index from the dataframe
     filtered_data = filtered_data.reset_index(drop=True)
-
+    
     return filtered_data
 
 def get_finnhub_news(

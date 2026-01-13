@@ -23,7 +23,7 @@ DEFAULT_CONFIG = {
     # Data vendor configuration
     # Category-level configuration (default for all tools in category)
     "data_vendors": {
-        "core_stock_apis": "yfinance",       # Options: yfinance, alpha_vantage, local
+        "core_stock_apis": "local",          # Options: local, yfinance, alpha_vantage - 优先使用本地数据
         "technical_indicators": "yfinance",  # Options: yfinance, alpha_vantage, local
         "fundamental_data": "alpha_vantage", # Options: alpha_vantage, local (不使用 openai)
         "news_data": "alpha_vantage,local",  # 指定fallback: alpha_vantage → local (跳过 openai)
