@@ -65,14 +65,24 @@ def fetch_top_from_category(
 
     all_content = []
 
-    if max_limit < len(os.listdir(os.path.join(base_path, category))):
+    # Check if the data path exists
+    category_path = os.path.join(base_path, category)
+    if not os.path.exists(category_path):
+        print(f"WARNING: Reddit data path does not exist: {category_path}")
+        return all_content
+
+    # Check if category directory has any files
+    files_in_category = os.listdir(category_path)
+    if len(files_in_category) == 0:
+        print(f"WARNING: No data files found in {category_path}")
+        return all_content
+
+    if max_limit < len(files_in_category):
         raise ValueError(
             "REDDIT FETCHING ERROR: max limit is less than the number of files in the category. Will not be able to fetch any posts"
         )
 
-    limit_per_subreddit = max_limit // len(
-        os.listdir(os.path.join(base_path, category))
-    )
+    limit_per_subreddit = max_limit // len(files_in_category)
 
     for data_file in os.listdir(os.path.join(base_path, category)):
         # check if data_file is a .jsonl file

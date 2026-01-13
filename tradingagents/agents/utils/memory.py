@@ -5,10 +5,16 @@ from openai import OpenAI
 
 class FinancialSituationMemory:
     def __init__(self, name, config):
-        if config["backend_url"] == "http://localhost:11434/v1":
-            self.embedding = "nomic-embed-text"
+        # 使用 ModelScope 的 embedding 模型
+        if config["backend_url"] == "https://api-inference.modelscope.cn/v1/":
+            self.embedding = "Qwen/Qwen3-Embedding-8B"
+        elif "modelscope" in config.get("llm_provider", "").lower():
+            # 如果 llm_provider 包含 modelscope,也使用 ModelScope embedding
+            self.embedding = "Qwen/Qwen3-Embedding-8B"
         else:
-            self.embedding = "text-embedding-3-small"
+            # 对于其他情况,使用兼容的 embedding 模型
+            self.embedding = "Qwen/Qwen3-Embedding-8B"
+        
         self.client = OpenAI(base_url=config["backend_url"])
         self.chroma_client = chromadb.Client(Settings(allow_reset=True))
         self.situation_collection = self.chroma_client.create_collection(name=name)
