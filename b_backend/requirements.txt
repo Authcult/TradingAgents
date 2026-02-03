@@ -1,0 +1,30 @@
+# TradingAgents Backend Dependencies
+
+# FastAPI and related
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# CORS
+starlette==0.35.1
+
+# Async support
+aiofiles==23.2.1
+
+# Environment variables
+python-dotenv==1.0.0
+
+# HTTP client
+httpx==0.26.0
+aiohttp==3.9.1
+
+# Date/time handling
+python-dateutil==2.8.2
+
+# JSON handling
+orjson==3.9.10
+
+# Logging
+loguru==0.7.2
